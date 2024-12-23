@@ -4,6 +4,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PLG_Exam.MainWindow"
-        Title="PLG_Exam">
-    Welcome to Avalonia!
+        Title="PLG Exam">
+    <DockPanel Margin="10">
+        <!-- Unterer Teil: Dateiverwaltung -->
+        <Border DockPanel.Dock="Bottom" Background="#232327" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center" Spacing="10">
+                <Button Content="Speichern" Click="OnSaveClick" />
+                <Button Content="Speichern unter..." Click="OnSaveAsClick" />
+                <Button Content="Öffnen" Click="OnOpenClick" />
+                <Button Content="Neu" Click="OnNewClick" />
+            </StackPanel>
+        </Border>
+
+        <!-- Oberer Teil: Name, Vorname, Datum -->
+        <Border DockPanel.Dock="Top" Background="#232327" Height="100" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="350" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="5" Spacing="5">
+                    <TextBlock Text="Name" FontWeight="Bold" Foreground="White" />
+                    <TextBox Name="NameField" Height="33"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="5" Spacing="5"> 
+                    <TextBlock Text="Vorname" FontWeight="Bold" Foreground="White" />
+                    <TextBox Name="VornameField" Height="33"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="5" Spacing="5">
+                    <TextBlock Text="Datum" HorizontalAlignment="Stretch" FontWeight="Bold" Foreground="White" />
+                    <DatePicker Name="DatumField" Width="340" Height="33" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Mittlerer Teil: Tabansicht -->
+        <Border Background="#232327" Margin="0,0,0,0">
+            <DockPanel>
+                <Button Content="Weitere Aufgabenlösung hinzufügen" DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="10,10,10,0" Click="OnAddTabClick" />
+                <TabControl Name="TabView" Margin="10">
+                    
+                </TabControl>
+            </DockPanel>
+        </Border>
+    </DockPanel>
 </Window>
