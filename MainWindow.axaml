@@ -13,6 +13,7 @@
                 <Button Content="Speichern unter..." Click="OnSaveAsClick" />
                 <Button Content="Öffnen" Click="OnOpenClick" />
                 <Button Content="Neu" Click="OnNewClick" />
+                <Button Content="Abgeben" Click="OnSubmitClick" />
             </StackPanel>
         </Border>
 
