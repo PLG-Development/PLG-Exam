@@ -18,5 +18,6 @@
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="PDFSharp-MigraDoc" Version="6.1.1" />
   </ItemGroup>
 </Project>

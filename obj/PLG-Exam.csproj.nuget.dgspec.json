@@ -64,6 +64,10 @@
             "Avalonia.Themes.Fluent": {
               "target": "Package",
               "version": "[11.2.1, )"
+            },
+            "PDFSharp-MigraDoc": {
+              "target": "Package",
+              "version": "[6.1.1, )"
             }
           },
           "imports": [
