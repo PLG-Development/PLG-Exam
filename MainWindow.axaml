@@ -17,8 +17,18 @@
             </StackPanel>
         </Border>
 
+        <!-- Überoberer Teil: Title -->
+        <Border DockPanel.Dock="Top" Background="#232327" Height="82" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <StackPanel Grid.Column="0" Margin="5" Spacing="5">
+                    <TextBlock Text="Titel der Arbeit" FontWeight="Bold" Foreground="White" />
+                    <TextBox Name="TitleField" Height="33"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Oberer Teil: Name, Vorname, Datum -->
-        <Border DockPanel.Dock="Top" Background="#232327" Height="100" Margin="0,0,0,10">
+        <Border DockPanel.Dock="Top" Background="#232327" Height="82" Margin="0,0,0,10">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
