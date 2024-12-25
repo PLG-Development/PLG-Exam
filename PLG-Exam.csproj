@@ -20,4 +20,11 @@
     </PackageReference>
     <PackageReference Include="PDFSharp-MigraDoc" Version="6.1.1" />
   </ItemGroup>
+
+  <ItemGroup>
+  <Content Include="resources\**\*">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
+
 </Project>
