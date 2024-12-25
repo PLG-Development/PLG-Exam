@@ -5,6 +5,7 @@ namespace PLG_Exam
 {
     public class Exam
     {
+        public string Title { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Vorname { get; set; } = string.Empty;
         public DateTime? Datum { get; set; }

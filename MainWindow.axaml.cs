@@ -203,6 +203,7 @@ namespace PLG_Exam
         {
             // Update Exam-Daten
             _currentExam.Name = NameField.Text;
+            _currentExam.Title = TitleField.Text;
             _currentExam.Vorname = VornameField.Text;
             _currentExam.Datum = DatumField.SelectedDate?.UtcDateTime;
             _currentExam.Tabs = TabView.Items.OfType<TabItem>()
@@ -258,6 +259,7 @@ namespace PLG_Exam
             // Daten wiederherstellen
             _currentExam = exam;
             NameField.Text = exam.Name;
+            TitleField.Text = exam.Title;
             VornameField.Text = exam.Vorname;
             DatumField.SelectedDate = exam.Datum;
 
@@ -487,6 +489,7 @@ namespace PLG_Exam
         // Holt die aktuelle Exam-Daten als JSON
         private string GetCurrentExamDataAsJson()
         {
+            _currentExam.Title = TitleField.Text;
             _currentExam.Name = NameField.Text;
             _currentExam.Vorname = VornameField.Text;
             _currentExam.Datum = DatumField.SelectedDate?.UtcDateTime;
@@ -522,7 +525,7 @@ namespace PLG_Exam
             {
 
                 _ = GetCurrentExamDataAsJson();
-                
+
                 var saveDialog = new SaveFileDialog
                 {
                     DefaultExtension = "pdf",
@@ -533,13 +536,14 @@ namespace PLG_Exam
 
                 var font = new XFont("Cantarell", 14, XFontStyleEx.Bold);
                 var fontB = new XFont("Cantarell", 14, XFontStyleEx.Bold);
+                var fontsmall = new XFont("Cantarell", 10, XFontStyleEx.Regular);
                 var descriptionFont = new XFont("Cantarell", 12, XFontStyleEx.Regular);
 
                 using var document = new PdfDocument();
 
                 var firstPage = document.AddPage();
                 var gfx = XGraphics.FromPdfPage(firstPage);
-                gfx.DrawString("PLG Exam", fontB, XBrushes.Black, new XRect(0, 40, firstPage.Width, 50), XStringFormats.TopCenter);
+                gfx.DrawString(_currentExam.Title, fontB, XBrushes.Black, new XRect(0, 40, firstPage.Width, 50), XStringFormats.TopCenter);
 
                 gfx.DrawString($"Name: {_currentExam.Name}", fontB, XBrushes.Black, new XRect(50, 100, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
                 gfx.DrawString($"Vorname: {_currentExam.Vorname}", fontB, XBrushes.Black, new XRect(50, 130, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
@@ -558,6 +562,33 @@ namespace PLG_Exam
                     formatter.Alignment = XParagraphAlignment.Left;
                     formatter.DrawString(tab.Inhalt, descriptionFont, XBrushes.Black, descriptionRect);
                 }
+
+                var endpage = document.AddPage();
+                var endpageGfx = XGraphics.FromPdfPage(endpage);
+
+                // Beschreibung am unteren Rand platzieren
+                var bottomDescriptionRect = new XRect(
+                    50,                                  // X-Position (horizontaler Abstand)
+                    endpage.Height - 100,                // Y-Position (Seitenhöhe - Textbereichshöhe - Margin)
+                    endpage.Width - 100,                 // Breite des Bereichs
+                    100                                  // Höhe des Bereichs
+                );
+
+                var endformatter = new XTextFormatter(endpageGfx)
+                {
+                    Alignment = XParagraphAlignment.Left
+                };
+
+                // Text zeichnen
+                endformatter.DrawString(
+                    "Erstellt mit PLG Exam - powered by PLG Development\nhttps://github.com/PLG-Development/PLG-Exam\n(c) 2024 - PLG Development",
+                    fontsmall,
+                    XBrushes.Black,
+                    bottomDescriptionRect
+                );
+
+                //endpageGfx.DrawString($"Erstellt mit PLG Exam - powered by PLG Development\nhttps://github.com/PLG-Development/PLG-Exam\n(c) 2024 - PLG Development", fontsmall, XBrushes.Black, new XRect(0,0, firstPage.Width, firstPage.Height), XStringFormats.BottomLeft);
+
 
                 document.Save(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
