@@ -13,6 +13,8 @@ using Avalonia.Threading;
 
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
+using PdfSharp.Drawing.Layout;
+using PdfSharp.Fonts;
 
 namespace PLG_Exam
 {
@@ -30,6 +32,7 @@ namespace PLG_Exam
             AddNewTab();
 
             this.KeyDown += OnKeyDown;
+            GlobalFontSettings.FontResolver = new CustomFontResolver();
         }
 
         // Event für "Neuen Tab hinzufügen"
@@ -519,8 +522,7 @@ namespace PLG_Exam
             {
 
                 _ = GetCurrentExamDataAsJson();
-
-                // Speicher-Dialog
+                
                 var saveDialog = new SaveFileDialog
                 {
                     DefaultExtension = "pdf",
@@ -529,34 +531,34 @@ namespace PLG_Exam
                 var filePath = await saveDialog.ShowAsync(this);
                 if (string.IsNullOrEmpty(filePath)) return;
 
-                // PDF-Dokument erstellen
+                var font = new XFont("Cantarell", 14, XFontStyleEx.Bold);
+                var fontB = new XFont("Cantarell", 14, XFontStyleEx.Bold);
+                var descriptionFont = new XFont("Cantarell", 12, XFontStyleEx.Regular);
+
                 using var document = new PdfDocument();
 
-                // Erste Seite: Name, Vorname, Datum
                 var firstPage = document.AddPage();
                 var gfx = XGraphics.FromPdfPage(firstPage);
-                var font = new XFont("Arial", 14, XFontStyleEx.Bold);
-                gfx.DrawString("PLG Exam", font, XBrushes.Black, new XRect(0, 0, firstPage.Width, 50), XStringFormats.TopCenter);
+                gfx.DrawString("PLG Exam", fontB, XBrushes.Black, new XRect(0, 40, firstPage.Width, 50), XStringFormats.TopCenter);
 
-                gfx.DrawString($"Name: {_currentExam.Name}", font, XBrushes.Black, new XRect(50, 100, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
-                gfx.DrawString($"Vorname: {_currentExam.Vorname}", font, XBrushes.Black, new XRect(50, 130, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
-                gfx.DrawString($"Datum: {_currentExam.Datum?.ToShortDateString() ?? "N/A"}", font, XBrushes.Black, new XRect(50, 160, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
+                gfx.DrawString($"Name: {_currentExam.Name}", fontB, XBrushes.Black, new XRect(50, 100, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
+                gfx.DrawString($"Vorname: {_currentExam.Vorname}", fontB, XBrushes.Black, new XRect(50, 130, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
+                gfx.DrawString($"Datum: {_currentExam.Datum?.ToShortDateString() ?? "N/A"}", fontB, XBrushes.Black, new XRect(50, 160, firstPage.Width, firstPage.Height), XStringFormats.TopLeft);
 
-                // Weitere Seiten: Aufgaben
                 foreach (var tab in _currentExam.Tabs)
                 {
                     var page = document.AddPage();
                     var pageGfx = XGraphics.FromPdfPage(page);
 
-                    pageGfx.DrawString($"Aufgabe {tab.Aufgabennummer}", font, XBrushes.Black, new XRect(50, 50, page.Width, page.Height), XStringFormats.TopLeft);
-                    pageGfx.DrawString($"Überschrift: {tab.Überschrift}", font, XBrushes.Black, new XRect(50, 100, page.Width, page.Height), XStringFormats.TopLeft);
+                    pageGfx.DrawString($"Aufgabe {tab.Aufgabennummer}", fontB, XBrushes.Black, new XRect(50, 50, page.Width, page.Height), XStringFormats.TopLeft);
+                    pageGfx.DrawString($"Überschrift: {tab.Überschrift}", fontB, XBrushes.Black, new XRect(50, 100, page.Width, page.Height), XStringFormats.TopLeft);
 
-                    var descriptionFont = new XFont("Arial", 12, XFontStyleEx.Regular);
                     var descriptionRect = new XRect(50, 150, page.Width - 100, page.Height - 200);
-                    pageGfx.DrawString(tab.Inhalt, descriptionFont, XBrushes.Black, descriptionRect, XStringFormats.TopLeft);
+                    var formatter = new XTextFormatter(pageGfx);
+                    formatter.Alignment = XParagraphAlignment.Left;
+                    formatter.DrawString(tab.Inhalt, descriptionFont, XBrushes.Black, descriptionRect);
                 }
 
-                // PDF speichern
                 document.Save(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
             }
@@ -566,7 +568,7 @@ namespace PLG_Exam
                 await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
             }
         }
-
-
     }
+
+
 }
