@@ -551,17 +551,9 @@ namespace PLG_Exam
 
                 foreach (var tab in _currentExam.Tabs)
                 {
-                    var page = document.AddPage();
-                    var pageGfx = XGraphics.FromPdfPage(page);
-
-                    pageGfx.DrawString($"Aufgabe {tab.Aufgabennummer}", fontB, XBrushes.Black, new XRect(50, 50, page.Width, page.Height), XStringFormats.TopLeft);
-                    pageGfx.DrawString($"Überschrift: {tab.Überschrift}", fontB, XBrushes.Black, new XRect(50, 100, page.Width, page.Height), XStringFormats.TopLeft);
-
-                    var descriptionRect = new XRect(50, 150, page.Width - 100, page.Height - 200);
-                    var formatter = new XTextFormatter(pageGfx);
-                    formatter.Alignment = XParagraphAlignment.Left;
-                    formatter.DrawString(tab.Inhalt, descriptionFont, XBrushes.Black, descriptionRect);
+                    DrawTaskWithPageBreak(document, tab, descriptionFont, font);
                 }
+
 
                 var endpage = document.AddPage();
                 var endpageGfx = XGraphics.FromPdfPage(endpage);
@@ -599,6 +591,101 @@ namespace PLG_Exam
                 await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
             }
         }
+
+        private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont)
+        {
+            const double margin = 50; // Seitenränder
+            const double lineHeight = 14; // Höhe einer Textzeile
+            const double headerHeight = 30; // Platz für die Kopfzeile pro Seite
+            const double footerHeight = 20; // Platz für die Fußzeile
+            const double usableHeight = 842 - margin * 2 - headerHeight - footerHeight; // Höhe des nutzbaren Bereichs
+
+            // Text aufteilen
+            var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin * 2, font);
+
+            double currentHeight = 0; // Aktuelle Höhe, die der Text benötigt
+
+            PdfPage page = null;
+            XGraphics gfx = null;
+
+            foreach (var line in lines)
+            {
+                // Neue Seite erstellen, falls nötig
+                if (page == null || currentHeight + lineHeight > usableHeight)
+                {
+                    page = document.AddPage();
+                    gfx = XGraphics.FromPdfPage(page);
+                    currentHeight = 0;
+
+                    // Kopfzeile zeichnen
+                    DrawHeader(gfx, tab, headerFont, margin, headerHeight);
+                }
+
+                // Zeile zeichnen
+                gfx.DrawString(line, font, XBrushes.Black, new XRect(margin, margin + headerHeight + currentHeight, page.Width - margin * 2, lineHeight), XStringFormats.TopLeft);
+                currentHeight += lineHeight;
+            }
+        }
+
+        // Methode zum Zeichnen der Kopfzeile
+        private void DrawHeader(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
+        {
+            var headerText = $"Aufgabe {tab.Aufgabennummer}: {tab.Überschrift}";
+            gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
+        }
+
+        // Methode zum Aufteilen des Textes in Zeilen
+        private List<string> SplitTextIntoLines(string text, double maxWidth, XFont font)
+        {
+            var lines = new List<string>();
+
+            // Text anhand von \n aufteilen, einschließlich leerer Zeilen
+            var manualLines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            using (var gfx = XGraphics.CreateMeasureContext(new XSize(maxWidth, 842), XGraphicsUnit.Point, XPageDirection.Downwards))
+            {
+                foreach (var manualLine in manualLines)
+                {
+                    // Falls die Zeile leer ist (z. B. durch mehrere \n), direkt hinzufügen
+                    if (string.IsNullOrWhiteSpace(manualLine))
+                    {
+                        lines.Add(""); // Leere Zeile hinzufügen
+                        continue;
+                    }
+
+                    // Falls eine Zeile zu lang ist, weiter aufteilen
+                    var words = manualLine.Split(' ');
+                    var currentLine = "";
+
+                    foreach (var word in words)
+                    {
+                        var testLine = string.IsNullOrEmpty(currentLine) ? word : $"{currentLine} {word}";
+                        var size = gfx.MeasureString(testLine, font);
+
+                        if (size.Width > maxWidth)
+                        {
+                            lines.Add(currentLine);
+                            currentLine = word;
+                        }
+                        else
+                        {
+                            currentLine = testLine;
+                        }
+                    }
+
+                    // Letzte Zeile hinzufügen
+                    if (!string.IsNullOrEmpty(currentLine))
+                    {
+                        lines.Add(currentLine);
+                    }
+                }
+            }
+
+            return lines;
+        }
+
+
+
     }
 
 
