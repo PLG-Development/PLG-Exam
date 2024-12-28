@@ -589,6 +589,7 @@ namespace PLG_Exam
 
 
                 document.Save(filePath);
+                SetPdfLanguage(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
             }
             catch (Exception ex)
@@ -690,9 +691,22 @@ namespace PLG_Exam
             return lines;
         }
 
+        private void SetPdfLanguage(string filePath, string language = "de-DE")
+        {
+            var pdfDocument = new PdfDocument(new PdfReader(filePath), new PdfWriter(filePath + "_temp"));
 
+            // Setze die Sprache im Root-Tag
+            pdfDocument.GetCatalog().SetLang(new iText.Kernel.Pdf.PdfString(language));
+            pdfDocument.Close();
+
+            // Ersetze das Original mit der aktualisierten Datei
+            File.Delete(filePath);
+            File.Move(filePath + "_temp", filePath);
+        }
 
     }
+
+    
 
 
 }
