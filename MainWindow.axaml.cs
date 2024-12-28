@@ -541,6 +541,12 @@ namespace PLG_Exam
 
                 using var document = new PdfDocument();
 
+                document.Info.Title = _currentExam.Title;
+                document.Info.Author = _currentExam.Vorname + " " + _currentExam.Name;
+                document.Info.Subject = "PLG Exam Submission";
+                document.Info.Keywords = "Exam, PLG, Report, PDF";
+                document.Info.Language = "de-DE"; // Deutsch (Deutschland)
+
                 var firstPage = document.AddPage();
                 var gfx = XGraphics.FromPdfPage(firstPage);
                 gfx.DrawString(_currentExam.Title, fontB, XBrushes.Black, new XRect(0, 40, firstPage.Width, 50), XStringFormats.TopCenter);
