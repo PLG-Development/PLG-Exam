@@ -545,7 +545,7 @@ namespace PLG_Exam
                 document.Info.Author = _currentExam.Vorname + " " + _currentExam.Name;
                 document.Info.Subject = "PLG Exam Submission";
                 document.Info.Keywords = "Exam, PLG, Report, PDF";
-                document.Info.Language = "de-DE"; // Deutsch (Deutschland)
+                
 
                 var firstPage = document.AddPage();
                 var gfx = XGraphics.FromPdfPage(firstPage);
