@@ -545,7 +545,8 @@ namespace PLG_Exam
                 document.Info.Author = _currentExam.Vorname + " " + _currentExam.Name;
                 document.Info.Subject = "PLG Exam Submission";
                 document.Info.Keywords = "Exam, PLG, Report, PDF";
-                
+                SetPdfLanguage(document);
+
 
                 var firstPage = document.AddPage();
                 var gfx = XGraphics.FromPdfPage(firstPage);
@@ -589,7 +590,6 @@ namespace PLG_Exam
 
 
                 document.Save(filePath);
-                SetPdfLanguage(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
             }
             catch (Exception ex)
@@ -691,17 +691,18 @@ namespace PLG_Exam
             return lines;
         }
 
-        private void SetPdfLanguage(string filePath, string language = "de-DE")
+        private void SetPdfLanguage(PdfSharp.Pdf.PdfDocument document, string language = "de")
         {
-            var pdfDocument = new PdfDocument(new PdfReader(filePath), new PdfWriter(filePath + "_temp"));
+            var catalog = document.Internals.Catalog;
 
-            // Setze die Sprache im Root-Tag
-            pdfDocument.GetCatalog().SetLang(new iText.Kernel.Pdf.PdfString(language));
-            pdfDocument.Close();
-
-            // Ersetze das Original mit der aktualisierten Datei
-            File.Delete(filePath);
-            File.Move(filePath + "_temp", filePath);
+            if (catalog.Elements.ContainsKey("/Lang"))
+            {
+                catalog.Elements["/Lang"] = new PdfSharp.Pdf.PdfString(language);
+            }
+            else
+            {
+                catalog.Elements.Add("/Lang", new PdfSharp.Pdf.PdfString(language));
+            }
         }
 
     }
