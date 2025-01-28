@@ -1,5 +1,5 @@
 # PLG Exam
-Open Source exam writing tool.
+Open Source exam writing tool featuring multiple tasks, and a resizable GUI.
 
 ## Features
 * Title, Author, Date
