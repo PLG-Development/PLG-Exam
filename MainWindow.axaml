@@ -8,13 +8,17 @@
     <DockPanel Margin="10">
         <!-- Unterer Teil: Dateiverwaltung -->
         <Border DockPanel.Dock="Top" Background="#232327" Height="60" Margin="0,0,0,10">
+        <Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center" Spacing="10">
-                <Button Content="Speichern" Click="OnSaveClick" />
-                <Button Content="Speichern unter..." Click="OnSaveAsClick" />
-                <Button Content="Öffnen" Click="OnOpenClick" />
-                <Button Content="Neu" Click="OnNewClick" />
-                <Button Content="Abgeben" Click="OnSubmitClick" />
-            </StackPanel>
+                    <Button Content="Speichern" Click="OnSaveClick" />
+                    <Button Content="Speichern unter..." Click="OnSaveAsClick" />
+                    <Button Content="Öffnen" Click="OnOpenClick" />
+                    <Button Content="Neu" Click="OnNewClick" />
+                    <Button Content="Abgeben" Click="OnSubmitClick" />
+                    
+                </StackPanel>
+                <Label x:Name="LblFilename" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,10" Content="Ungespeichert *" />
+        </Grid>
         </Border>
 
         <!-- Überoberer Teil: Title -->

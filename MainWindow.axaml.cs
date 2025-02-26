@@ -17,6 +17,7 @@ using PdfSharp.Drawing.Layout;
 using PdfSharp.Fonts;
 
 using System.Globalization;
+using MigraDoc.DocumentObjectModel;
 
 // ToDo
 // - Rand [check]
@@ -41,7 +42,7 @@ namespace PLG_Exam
         {
             InitializeComponent();
             InitializeBackupTimer();
-            AddNewTab();
+            //AddNewTab();
 
             this.KeyDown += OnKeyDown;
             GlobalFontSettings.FontResolver = new CustomFontResolver();
@@ -113,8 +114,8 @@ namespace PLG_Exam
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 Width = 20,
                 Height = 20,
-                Background = new SolidColorBrush(Color.FromRgb(123,35,39)),
-                Foreground = new SolidColorBrush(Color.FromRgb(0,0,0)),
+                Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(123,35,39)),
+                Foreground = new SolidColorBrush(Avalonia.Media.Color.FromRgb(0,0,0)),
                 Padding = new Thickness(0),
                 Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
@@ -151,12 +152,16 @@ namespace PLG_Exam
                 {
                     TabView.Items.Remove(tabItem);
                     _isSaved = false;
+
+                    LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
                 }
             };
 
             TabView.Items.Add(tabItem);
             TabView.SelectedItem = tabItem;
             _isSaved = false;
+
+            LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
         }
 
 
@@ -171,6 +176,7 @@ namespace PLG_Exam
                 {
                     TabView.Items.Remove(selectedTab);
                     _isSaved = false;
+                    LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
                 }
             }
         }
@@ -243,6 +249,8 @@ namespace PLG_Exam
 
             _currentFilePath = filePath;
             _isSaved = true;
+
+            LblFilename.Content = !_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ";
         }
 
         // Öffnen
@@ -292,6 +300,8 @@ namespace PLG_Exam
 
             _currentFilePath = filePath;
             _isSaved = true;
+
+            LblFilename.Content = !_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ";
         }
 
         private StackPanel ReturnTabHeaderContent(string name, TabItem curr_tab){
@@ -303,8 +313,8 @@ namespace PLG_Exam
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 Width = 20,
                 Height = 20,
-                Background = new SolidColorBrush(Color.FromRgb(123,35,39)),
-                Foreground = new SolidColorBrush(Color.FromRgb(0,0,0)),
+                Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(123,35,39)),
+                Foreground = new SolidColorBrush(Avalonia.Media.Color.FromRgb(0,0,0)),
                 Padding = new Thickness(0),
                 Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
@@ -335,6 +345,7 @@ namespace PLG_Exam
                 {
                     TabView.Items.Remove(curr_tab);
                     _isSaved = false;
+                    LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
                 }
             };
 
@@ -364,6 +375,8 @@ namespace PLG_Exam
             _tabCounter = 0;
             _currentFilePath = null;
             _isSaved = true;
+
+            LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
         }
 
         private Grid CreateTabContent(string? aufgabennummer = null, string? ueberschrift = null, string? beschreibung = null)
@@ -399,11 +412,21 @@ namespace PLG_Exam
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
                 Watermark = "Beschreibung",
                 Text = beschreibung ?? "",
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                LineHeight = 21,
+                FontSize = 14,
+                Margin = new Thickness(0, 0, 0, 10)
             };
 
             // Event für dynamische Tab-Umbenennung
-            aufgabenNummerTextBox.KeyUp += (s, e) => UpdateTabHeader(TabView.SelectedItem as TabItem, aufgabenNummerTextBox, ueberschriftTextBox);
-            ueberschriftTextBox.KeyUp += (s, e) => UpdateTabHeader(TabView.SelectedItem as TabItem, aufgabenNummerTextBox, ueberschriftTextBox);
+            aufgabenNummerTextBox.TextChanged += (s, e) => UpdateTabHeader(TabView.SelectedItem as TabItem, aufgabenNummerTextBox, ueberschriftTextBox);
+            ueberschriftTextBox.TextChanged += (s, e) => UpdateTabHeader(TabView.SelectedItem as TabItem, aufgabenNummerTextBox, ueberschriftTextBox);
+
+            beschreibungTextBox.TextChanged += (s, e) =>
+            {
+                _isSaved = false;
+                LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
+            };
 
             headerGrid.Children.Add(aufgabenNummerTextBox);
             headerGrid.Children.Add(ueberschriftTextBox);
@@ -428,6 +451,10 @@ namespace PLG_Exam
             tab.Header = ReturnTabHeaderContent(string.IsNullOrWhiteSpace(ueberschriftText)
                 ? aufgabeText
                 : $"{aufgabeText} - {ueberschriftText}", tab);
+
+
+            _isSaved = false;
+            LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
         }
 
 
