@@ -20,13 +20,8 @@ using System.Globalization;
 using MigraDoc.DocumentObjectModel;
 
 // ToDo
-// - Rand [check]
-// - 1,5 zeilig [check]
-// - Namen auf jeder Seite [check]
 // - PDF Export keine Namen -> Error
 // - White Mode Access
-// - Information on last page
-// - Fixed Width at task edit field
 
 
 namespace PLG_Exam
