@@ -19,11 +19,12 @@ using PdfSharp.Fonts;
 using System.Globalization;
 
 // ToDo
-// - Rand
-// - 1,5 zeilig
-// - Namen auf jeder Seite
+// - Rand [check]
+// - 1,5 zeilig [check]
+// - Namen auf jeder Seite [check]
 // - PDF Export keine Namen -> Error
-// 
+// - White Mode Access
+// - Information on last page
 
 
 
