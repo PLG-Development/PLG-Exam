@@ -16,6 +16,17 @@ using PdfSharp.Drawing;
 using PdfSharp.Drawing.Layout;
 using PdfSharp.Fonts;
 
+using System.Globalization;
+
+// ToDo
+// - Rand
+// - 1,5 zeilig
+// - Namen auf jeder Seite
+// - PDF Export keine Namen -> Error
+// 
+
+
+
 namespace PLG_Exam
 {
     public partial class MainWindow : Window
@@ -271,14 +282,62 @@ namespace PLG_Exam
                 _tabCounter++;
                 var tabItem = new TabItem
                 {
-                    Header = $"{tab.Aufgabennummer} - {tab.Überschrift}",
+                    
                     Content = CreateTabContent(tab.Aufgabennummer, tab.Überschrift, tab.Inhalt)
                 };
+                tabItem.Header = ReturnTabHeaderContent($"{tab.Aufgabennummer} - {tab.Überschrift}", tabItem);
                 TabView.Items.Add(tabItem);
             }
 
             _currentFilePath = filePath;
             _isSaved = true;
+        }
+
+        private StackPanel ReturnTabHeaderContent(string name, TabItem curr_tab){
+            var closeButton = new Button
+            {
+                Content = "×",
+                FontSize = 14,
+                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                Width = 20,
+                Height = 20,
+                Background = new SolidColorBrush(Color.FromRgb(123,35,39)),
+                Foreground = new SolidColorBrush(Color.FromRgb(0,0,0)),
+                Padding = new Thickness(0),
+                Margin = new Thickness(5, 0, 0, 0),
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+            };
+
+            ToolTip.SetTip(closeButton, "Tab schließen");
+
+            var headerStackPanel = new StackPanel
+            {
+                Orientation = Avalonia.Layout.Orientation.Horizontal
+            };
+
+            var tabHeader = new TextBlock
+            {
+                Text = name,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+            };
+
+            headerStackPanel.Children.Add(tabHeader);
+            headerStackPanel.Children.Add(closeButton);
+
+            // Schließen-Event hinzufügen
+            closeButton.Click += async (sender, e) =>
+            {
+                var result = await MessageBox.Show(this, "Diese Aktion schließt die Aufgabe unwiderruflich. Möchten Sie fortfahren?", 
+                                                "Tab schließen", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    TabView.Items.Remove(curr_tab);
+                    _isSaved = false;
+                }
+            };
+
+            return headerStackPanel;
         }
 
         // Neu
@@ -365,9 +424,9 @@ namespace PLG_Exam
             var aufgabeText = string.IsNullOrWhiteSpace(aufgabennummer.Text) ? "Neu" : aufgabennummer.Text;
             var ueberschriftText = string.IsNullOrWhiteSpace(ueberschrift.Text) ? "" : ueberschrift.Text;
 
-            tab.Header = string.IsNullOrWhiteSpace(ueberschriftText)
+            tab.Header = ReturnTabHeaderContent(string.IsNullOrWhiteSpace(ueberschriftText)
                 ? aufgabeText
-                : $"{aufgabeText} - {ueberschriftText}";
+                : $"{aufgabeText} - {ueberschriftText}", tab);
         }
 
 
@@ -558,7 +617,7 @@ namespace PLG_Exam
 
                 foreach (var tab in _currentExam.Tabs)
                 {
-                    DrawTaskWithPageBreak(document, tab, descriptionFont, font);
+                    DrawTaskWithPageBreak(document, tab, descriptionFont, font, fontsmall);
                 }
 
 
@@ -580,7 +639,7 @@ namespace PLG_Exam
 
                 // Text zeichnen
                 endformatter.DrawString(
-                    "Erstellt mit PLG Exam - powered by PLG Development\nhttps://github.com/PLG-Development/PLG-Exam\n(c) 2024 - PLG Development",
+                    "Erstellt mit PLG Exam - powered by PLG Development\nhttps://github.com/PLG-Development/PLG-Exam\n(c) 2025 - PLG Development",
                     fontsmall,
                     XBrushes.Black,
                     bottomDescriptionRect
@@ -599,16 +658,17 @@ namespace PLG_Exam
             }
         }
 
-        private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont)
+        private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont, XFont smallFont)
         {
             const double margin = 50; // Seitenränder
-            const double lineHeight = 14; // Höhe einer Textzeile
+            const double corr_margin = 250; // Seitenrand Korrektur
+            const double lineHeight = 21; // Höhe einer Textzeile
             const double headerHeight = 30; // Platz für die Kopfzeile pro Seite
             const double footerHeight = 20; // Platz für die Fußzeile
             const double usableHeight = 842 - margin * 2 - headerHeight - footerHeight; // Höhe des nutzbaren Bereichs
 
             // Text aufteilen
-            var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin * 2, font);
+            var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin -corr_margin, font);
 
             double currentHeight = 0; // Aktuelle Höhe, die der Text benötigt
 
@@ -625,11 +685,12 @@ namespace PLG_Exam
                     currentHeight = 0;
 
                     // Kopfzeile zeichnen
+                    DrawName(gfx, tab, smallFont, margin, headerHeight);
                     DrawHeader(gfx, tab, headerFont, margin, headerHeight);
                 }
 
                 // Zeile zeichnen
-                gfx.DrawString(line, font, XBrushes.Black, new XRect(margin, margin + headerHeight + currentHeight, page.Width - margin * 2, lineHeight), XStringFormats.TopLeft);
+                gfx.DrawString(line, font, XBrushes.Black, new XRect(margin, margin + headerHeight + currentHeight, page.Width - margin - corr_margin, lineHeight), XStringFormats.TopLeft);
                 currentHeight += lineHeight;
             }
         }
@@ -639,6 +700,16 @@ namespace PLG_Exam
         {
             var headerText = $"Aufgabe {tab.Aufgabennummer}: {tab.Überschrift}";
             gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
+        }
+
+        private void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
+        {
+            var headerText = $"{_currentExam.Name}, {_currentExam.Vorname}";
+            gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin-15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
+    
+            var headerText2 = _currentExam.Datum.Value.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("de-DE"));
+            gfx.DrawString(headerText2, font, XBrushes.Gray, new XRect(margin, margin-15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopRight);
+    
         }
 
         // Methode zum Aufteilen des Textes in Zeilen
