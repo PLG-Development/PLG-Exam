@@ -25,7 +25,7 @@ using System.Globalization;
 // - PDF Export keine Namen -> Error
 // - White Mode Access
 // - Information on last page
-
+// - Fixed Width at task edit field
 
 
 namespace PLG_Exam
@@ -644,9 +644,30 @@ namespace PLG_Exam
                     fontsmall,
                     XBrushes.Black,
                     bottomDescriptionRect
+                );        
+
+                 // Beschreibung am unteren Rand platzieren
+                var informationRect = new XRect(
+                    50,                                  // X-Position (horizontaler Abstand)
+                    50,                // Y-Position (Seitenhöhe - Textbereichshöhe - Margin)
+                    endpage.Width - 100,                 // Breite des Bereichs
+                    300                                  // Höhe des Bereichs
                 );
 
-                //endpageGfx.DrawString($"Erstellt mit PLG Exam - powered by PLG Development\nhttps://github.com/PLG-Development/PLG-Exam\n(c) 2024 - PLG Development", fontsmall, XBrushes.Black, new XRect(0,0, firstPage.Width, firstPage.Height), XStringFormats.BottomLeft);
+                string outinfo = $"Dieses Dokument wurde automatisch erstellt und enthält alle Bestandteile Ihrer Prüfung. Bitte prüfen Sie alle Inhalte vor der Abgabe und speichern das Dokument an einem sicheren Ort. Nutzen Sie zur Abgabe bitte einen USB-Stick.";
+                outinfo += $"\n\nErstelldatum: {DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("de-DE"))}";
+                outinfo += $"\nErstellzeit: {DateTime.Now.ToString("HH:mm:ss", CultureInfo.CreateSpecificCulture("de-DE"))} Uhr";
+                outinfo += $"\nGerätename: {Environment.MachineName}";
+                outinfo += $"\nBetriebssystem: {Environment.OSVersion.VersionString}";
+                outinfo += $"\nIP-Adresse: {System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)}";
+                outinfo += $"\nBenutzername: {Environment.UserName}";
+
+                endformatter.DrawString(
+                    outinfo,
+                    fontsmall,
+                    XBrushes.Black,
+                    informationRect
+                );
 
 
                 document.Save(filePath);
