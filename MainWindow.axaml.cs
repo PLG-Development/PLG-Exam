@@ -608,6 +608,11 @@ namespace PLG_Exam
 
                 _ = GetCurrentExamDataAsJson();
 
+                if(_currentExam.Name.IsValueNullOrEmpty() || _currentExam.Vorname.IsValueNullOrEmpty() || _currentExam.Title.IsValueNullOrEmpty() || _currentExam.Datum == null){
+                    await MessageBox.Show(this, "Bitte füllen Sie mindestens die Felder für Name, Vorname, Titel und Datum aus", "Fehler", MessageBoxButton.Ok);
+                    return;
+                }
+
                 var saveDialog = new SaveFileDialog
                 {
                     DefaultExtension = "pdf",
