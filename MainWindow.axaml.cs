@@ -18,9 +18,9 @@ using PdfSharp.Fonts;
 
 using System.Globalization;
 using MigraDoc.DocumentObjectModel;
+using System.Net.NetworkInformation;
 
 // ToDo
-// - PDF Export keine Namen -> Error
 // - White Mode Access
 
 
@@ -681,13 +681,14 @@ namespace PLG_Exam
                     300                                  // Höhe des Bereichs
                 );
 
-                string outinfo = $"Dieses Dokument wurde automatisch erstellt und enthält alle Bestandteile Ihrer Prüfung. Bitte prüfen Sie alle Inhalte vor der Abgabe und speichern das Dokument an einem sicheren Ort. Nutzen Sie zur Abgabe bitte einen USB-Stick.";
+                string outinfo = $"Dieses Dokument wurde automatisch erstellt und enthält alle Bestandteile Ihrer Prüfung. Bitte prüfen Sie alle Inhalte vor der Abgabe und speichern das Dokument an einem sicheren Ort. Nutzen Sie zur Abgabe bitte einen durch die Lehrkraft gestellten USB-Stick.";
                 outinfo += $"\n\nErstelldatum: {DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("de-DE"))}";
                 outinfo += $"\nErstellzeit: {DateTime.Now.ToString("HH:mm:ss", CultureInfo.CreateSpecificCulture("de-DE"))} Uhr";
                 outinfo += $"\nGerätename: {Environment.MachineName}";
                 outinfo += $"\nBetriebssystem: {Environment.OSVersion.VersionString}";
                 outinfo += $"\nIP-Adresse: {System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)}";
                 outinfo += $"\nBenutzername: {Environment.UserName}";
+                outinfo += $"Internetverbindung: {(isInternetAvailable() ? "8.8.8.8 ist erreichbar" : "8.8.8.8 ist nicht erreichbar")}";
 
                 endformatter.DrawString(
                     outinfo,
@@ -704,6 +705,22 @@ namespace PLG_Exam
             {
                 Console.WriteLine($"Fehler beim PDF-Export: {ex.Message}");
                 await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
+            }
+        }
+
+        private bool isInternetAvailable()
+        {
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    var reply = ping.Send("8.8.8.8", 7000); // 3000 ms timeout
+                    return reply.Status == IPStatus.Success;
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 
