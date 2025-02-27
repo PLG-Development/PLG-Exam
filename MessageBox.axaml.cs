@@ -42,12 +42,12 @@ public partial class MessageBox : Window
             AddButton("Ok", MessageBoxResult.Ok, true);
         if (buttons == MessageBoxButton.YesNo || buttons == MessageBoxButton.YesNoCancel)
         {
-            AddButton("Yes", MessageBoxResult.Yes);
-            AddButton("No", MessageBoxResult.No, true);
+            AddButton("Ja", MessageBoxResult.Yes);
+            AddButton("Nein", MessageBoxResult.No, true);
         }
 
         if (buttons == MessageBoxButton.OkCancel || buttons == MessageBoxButton.YesNoCancel)
-            AddButton("Cancel", MessageBoxResult.Cancel, true);
+            AddButton("Abbrechen", MessageBoxResult.Cancel, true);
 
 
 

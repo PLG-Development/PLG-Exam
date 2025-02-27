@@ -19,9 +19,8 @@ using PdfSharp.Fonts;
 using System.Globalization;
 using MigraDoc.DocumentObjectModel;
 using System.Net.NetworkInformation;
-
-// ToDo
-// - White Mode Access
+using Avalonia.Styling;
+using Avalonia.Themes.Fluent;
 
 
 namespace PLG_Exam
@@ -41,6 +40,41 @@ namespace PLG_Exam
 
             this.KeyDown += OnKeyDown;
             GlobalFontSettings.FontResolver = new CustomFontResolver();
+
+            RenewColors();
+            this.Closing += MainWindow_Closing;
+            
+        }
+
+        private void OnDarkModeClick(object? sender, RoutedEventArgs e)
+        {
+            if (Application.Current is App app)
+            {
+                app.ToggleTheme();
+                RenewColors();
+            }
+
+            
+        }
+
+        private void RenewColors(){
+            if(Application.Current.ActualThemeVariant == ThemeVariant.Dark){
+                BrdMid.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(35,35,39)); // #232327
+                //BrdTop.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(35,35,39)); // #232327
+                BrdTitle.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(35,35,39)); // #232327
+                BrdName.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(35,35,39)); // #232327
+            } else {
+                BrdMid.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(230,230,230)); // #232327
+                //BrdTop.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(230,230,230)); // #232327
+                BrdTitle.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(230,230,230)); // #232327
+                BrdName.Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(230,230,230)); // #232327
+            }
+
+            if(Application.Current.ActualThemeVariant == ThemeVariant.Dark){
+                BtnTheme.Content="🌞";
+            } else {
+                BtnTheme.Content="🌙";
+            }
         }
 
         // Event für "Neuen Tab hinzufügen"
@@ -296,7 +330,9 @@ namespace PLG_Exam
             _currentFilePath = filePath;
             _isSaved = true;
 
-            LblFilename.Content = !_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ";
+            LblFilename.Content = !_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert *";
+
+            SaveToFile(filePath);
         }
 
         private StackPanel ReturnTabHeaderContent(string name, TabItem curr_tab){
@@ -347,6 +383,30 @@ namespace PLG_Exam
             return headerStackPanel;
         }
 
+        private async void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            if (!_isSaved)
+            {
+                MessageBoxResult result = await MessageBox.Show(this, "Möchten Sie die aktuellen Änderungen speichern?", 
+                                                   "Nicht gespeicherte Änderungen", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Cancel) {
+                    e.Cancel = true;
+                    return;
+                }
+                if (result == MessageBoxResult.Yes) {
+                    //SaveToFile(_currentFilePath);
+                    OnSaveClick(null,null);
+                    if(_isSaved == false){
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+            }
+            e.Cancel = false;
+            Environment.Exit(0);
+        }
+
         // Neu
         private async void OnNewClick(object? sender, RoutedEventArgs e)
         {
@@ -371,7 +431,7 @@ namespace PLG_Exam
             _currentFilePath = null;
             _isSaved = true;
 
-            LblFilename.Content = (!_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert ") + " *";
+            LblFilename.Content = !_currentFilePath.IsValueNullOrEmpty() ? Path.GetFileName(_currentFilePath) : "Ungespeichert *";
         }
 
         private Grid CreateTabContent(string? aufgabennummer = null, string? ueberschrift = null, string? beschreibung = null)
