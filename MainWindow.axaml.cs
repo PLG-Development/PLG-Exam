@@ -688,7 +688,7 @@ namespace PLG_Exam
                 outinfo += $"\nBetriebssystem: {Environment.OSVersion.VersionString}";
                 outinfo += $"\nIP-Adresse: {System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)}";
                 outinfo += $"\nBenutzername: {Environment.UserName}";
-                outinfo += $"Internetverbindung: {(isInternetAvailable() ? "8.8.8.8 ist erreichbar" : "8.8.8.8 ist nicht erreichbar")}";
+                outinfo += $"\nInternetverbindung: {(isInternetAvailable() ? "8.8.8.8 ist erreichbar" : "8.8.8.8 ist nicht erreichbar")}";
 
                 endformatter.DrawString(
                     outinfo,
