@@ -685,9 +685,9 @@ namespace PLG_Exam
                 outinfo += $"\n\nErstelldatum: {DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("de-DE"))}";
                 outinfo += $"\nErstellzeit: {DateTime.Now.ToString("HH:mm:ss", CultureInfo.CreateSpecificCulture("de-DE"))} Uhr";
                 outinfo += $"\nGerätename: {Environment.MachineName}";
+                outinfo += $"\nBenutzername: {Environment.UserName}";
                 outinfo += $"\nBetriebssystem: {Environment.OSVersion.VersionString}";
                 outinfo += $"\nIP-Adresse: {System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)}";
-                outinfo += $"\nBenutzername: {Environment.UserName}";
                 outinfo += $"\nInternetverbindung: {(isInternetAvailable() ? "8.8.8.8 ist erreichbar" : "8.8.8.8 ist nicht erreichbar")}";
 
                 endformatter.DrawString(
