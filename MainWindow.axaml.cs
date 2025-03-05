@@ -345,7 +345,7 @@ namespace PLG_Exam
                 Width = 20,
                 Height = 20,
                 Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(123,35,39)),
-                Foreground = new SolidColorBrush(Avalonia.Media.Color.FromRgb(0,0,0)),
+                Foreground = new SolidColorBrush(Avalonia.Media.Color.FromRgb(255,255,255)),
                 Padding = new Thickness(0),
                 Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
@@ -517,7 +517,7 @@ namespace PLG_Exam
         // Backups
         //
 
-        private const int BackupInterval = 20000; // 20 Sekunden in Millisekunden
+        private const int BackupInterval = 10000; // 20 Sekunden in Millisekunden
         
 
         private DispatcherTimer _backupTimer;
@@ -532,10 +532,10 @@ namespace PLG_Exam
             _backupTimer.Start();
         }
 
-        private const int MaxBackupFiles = 5; // Maximal 5 Backups
+        private const int MaxBackupFiles = 25; // Maximal 5 Backups
         private readonly string BackupFolderPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
-            "PLG_Exam_Backup");
+            "PLG-Development", "PLG-Exam", "backup");
 
         
 
@@ -787,14 +787,14 @@ namespace PLG_Exam
         private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont, XFont smallFont)
         {
             const double margin = 50; // Seitenränder
-            const double corr_margin = 250; // Seitenrand Korrektur
+            const double corr_margin = 300; // Seitenrand Korrektur
             const double lineHeight = 21; // Höhe einer Textzeile
             const double headerHeight = 30; // Platz für die Kopfzeile pro Seite
             const double footerHeight = 20; // Platz für die Fußzeile
             const double usableHeight = 842 - margin * 2 - headerHeight - footerHeight; // Höhe des nutzbaren Bereichs
 
             // Text aufteilen
-            var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin -corr_margin, font);
+            var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin - corr_margin, font);
 
             double currentHeight = 0; // Aktuelle Höhe, die der Text benötigt
 
@@ -816,7 +816,7 @@ namespace PLG_Exam
                 }
 
                 // Zeile zeichnen
-                gfx.DrawString(line, font, XBrushes.Black, new XRect(margin, margin + headerHeight + currentHeight, page.Width - margin - corr_margin, lineHeight), XStringFormats.TopLeft);
+                gfx.DrawString(line, font, XBrushes.Black, new XRect(corr_margin, margin + headerHeight + currentHeight, page.Width - margin, lineHeight), XStringFormats.TopLeft);
                 currentHeight += lineHeight;
             }
         }
