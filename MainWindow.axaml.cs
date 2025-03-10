@@ -816,17 +816,28 @@ namespace PLG_Exam
                 }
 
                 // Zeile zeichnen
-                gfx.DrawString(line, font, XBrushes.Black, new XRect(corr_margin, margin + headerHeight + currentHeight, page.Width - margin, lineHeight), XStringFormats.TopLeft);
+                gfx.DrawString(line, font, XBrushes.Black, new XRect(corr_margin, margin + headerHeight*headerline_count + currentHeight, page.Width - margin, lineHeight), XStringFormats.TopLeft);
                 currentHeight += lineHeight;
             }
         }
 
-        // Methode zum Zeichnen der Kopfzeile
+        int headerline_count = 0;
         private void DrawHeader(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
         {
-            var headerText = $"Aufgabe {tab.Aufgabennummer}: {tab.Überschrift}";
-            gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
+            var maxWidth = gfx.PageSize.Width - margin * 2; // verfügbare Breite
+            var lines = SplitTextIntoLines($"Aufgabe {tab.Aufgabennummer}: {tab.Überschrift}", maxWidth, font);
+
+            double currentY = margin;
+            headerline_count=0;
+            foreach (var line in lines)
+            {
+                gfx.DrawString(line, font, XBrushes.Gray, new XRect(margin, currentY, maxWidth, headerHeight), XStringFormats.TopLeft);
+                currentY += font.Height; 
+
+                headerline_count++;
+            }
         }
+
 
         private void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
         {
