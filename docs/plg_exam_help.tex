@@ -1,5 +1,5 @@
 \documentclass[]{article}
-\usepackage[a4paper]{geometry}
+\usepackage[left=3cm,right=3cm,top=3cm, bottom=3cm,a4paper]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{float}
@@ -7,13 +7,76 @@
 \usepackage{tabularx}
 \usepackage{color}
 \usepackage{enumitem}
+\usepackage{tcolorbox}
 \usepackage[hidelinks]{hyperref}
 \renewcommand{\contentsname}{Inhalt}
 \renewcommand{\figurename}{Grafik}
+
+
+\tcbset{
+	example/.style={
+		colback=white,    % Hintergrundfarbe
+		colframe=white!75!darkgray, % Rahmenfarbe
+		fonttitle=\bfseries,    % Titel fettgedruckt
+		boxrule=0.6mm,          % Dicke des Rahmens
+		coltitle=black,         % Farbe des Titels
+		rounded corners,          % Ecken der Box
+		width=\textwidth,       % Breite der Box
+		before skip=10pt,       % Abstand vor der Box
+		after skip=10pt         % Abstand nach der Box
+	}
+}
+
+\tcbset{
+	antiexample/.style={
+		colback=white,    % Hintergrundfarbe
+		colframe=white!15!darkgray, % Rahmenfarbe
+		fonttitle=\bfseries,    % Titel fettgedruckt
+		boxrule=0.6mm,          % Dicke des Rahmens
+		coltitle=black,         % Farbe des Titels
+		rounded corners,          % Ecken der Box
+		width=\textwidth,       % Breite der Box
+		before skip=10pt,       % Abstand vor der Box
+		after skip=10pt         % Abstand nach der Box
+	}
+}
+
+\tcbset{
+	warning/.style={
+		colback=white,    % Hintergrundfarbe
+		colframe=white!75!red, % Rahmenfarbe
+		fonttitle=\bfseries,    % Titel fettgedruckt
+		boxrule=0.6mm,          % Dicke des Rahmens
+		coltitle=black,         % Farbe des Titels
+		rounded corners,          % Ecken der Box
+		width=\textwidth,       % Breite der Box
+		before skip=10pt,       % Abstand vor der Box
+		after skip=10pt         % Abstand nach der Box
+	}
+}
+
+\tcbset{
+	note/.style={
+		colback=white,    % Hintergrundfarbe
+		colframe=white!75!orange, % Rahmenfarbe
+		fonttitle=\bfseries,    % Titel fettgedruckt
+		boxrule=0.6mm,          % Dicke des Rahmens
+		coltitle=black,         % Farbe des Titels
+		rounded corners,          % Ecken der Box
+		width=\textwidth,       % Breite der Box
+		before skip=10pt,       % Abstand vor der Box
+		after skip=10pt         % Abstand nach der Box
+	}
+}
+
+
+
 \title{Grundlagen zu PLG Exam}
 \date{März 2025}
 \author{Elias Fierke}
 \begin{document}
+	\ofoot{Seite {\pagemark} von \pageref{LastPage}}
+	\ohead{}
 	\begin{figure}
 	\centering
 		\includegraphics[width=0.2\textwidth]{plgicon.png}
@@ -24,7 +87,13 @@
 	\newpage
 	\section{Einleitung}
 	Herzlich Willkommen! In diesem Dokument lernen Sie die grundlegende Bedienung von PLG Exam, der schülerseitigen Schreibsoftware zum Lösen von Klausuren für Schüler*innen mit Nachteilsausgleich.\\\\
-    Im Nachfolgenden wird an den meisten Stellen aufgrund von Lesbarkeit und fehlender Regelung in der deutschen Sprache nur "der Schüler" als Synonym für "Schülerinnen, Schüler, alles dazwischen und außenrum" verwendet. Gemeint ist also diejenige Person, die die Prüfung antritt und das Programm zum Bearbeiten der Aufgaben nutzt.
+    Im Dokument werden folgende Abkürzungen zur Aufteilung zwischen Lernenden und Lehrkraft verwendet:
+    \begin{itemize}
+    	\item \textbf{S}\hspace*{15pt}$\rightarrow$\hspace*{15pt}Schüler*in (Prüfling)
+    	\item \textbf{L}\hspace*{15pt}$\rightarrow$\hspace*{15pt}Lehrkraft (Prüfer*in)
+    \end{itemize}
+    
+    Die \textbf{Abgabe} der Klausur erfolgt über einen PDF-Export, der die Inhalte in eine einfach lesbare PDF-Datei exportiert und wird erst am Ende der Klausur durchgeführt.
 	
     \newpage
     \section{Start der Anwendung und erste Handlungen}
@@ -35,7 +104,153 @@
     \newpage
     \section{Bearbeiten der Klausur}
     \subsection{Klausurformalitäten}
-    
+    \subsubsection{Titel}
+    Der Titel der Klausur steht in der Abgabe schlussendlich ganz oben auf der ersten Seite und sollte im Idealfall Typ der Klausur, Klassenstufe/Kurs und Fach beinhalten.
 
+	\begin{tcolorbox}[example, title=Beispiel: Titel]
+		Als Titel kann zum Beispiel\\\\
+		\hspace*{15pt}\texttt{2. Klassenarbeit Deutsch}\\
+		\hspace*{15pt}\texttt{Abiturlausur Englisch Leistungskurs}\\
+		\hspace*{15pt}\texttt{Geschichte 12 - Quellenanalyse}\\\\
+		verwendet werden. Der Titel dient also zur groben Beschreibung der Arbeit.
+	\end{tcolorbox}
+	
+	\subsubsection{Name}
+	Der Nachname des Schülers.
+	\begin{tcolorbox}[example, title=Beispiel: Name]
+		\hspace*{15pt}\texttt{Meier}\\
+		\hspace*{15pt}\texttt{Hoffmann}\\
+		\hspace*{15pt}\texttt{Nguyen}
+	\end{tcolorbox}
 
+	\subsubsection{Vorname}
+	Der oder die Vorname(n) des Schülers.
+	\begin{tcolorbox}[example, title=Beispiel: Vorname]
+		\hspace*{15pt}\texttt{Ida}\\
+		\hspace*{15pt}\texttt{Tom}\\
+		\hspace*{15pt}\texttt{Latsch Lisa}
+	\end{tcolorbox}
+	
+	\subsubsection{Datum}
+	Das Datum der Ausarbeitung. Es kann aus einem Menü gewählt werden. Öffnen Sie das Menü, so ist das heutige Datum bereits eingestellt und kann mit dem Häkchen bestätigt werden. Gegebenenfalls kann ein anderes Datum eingestellt werden.
+	
+	\newpage
+	\subsection{Aufgabenstellungen}
+	Sie wählen zunächst "Weitere Aufgabenlösung hinzufügen". Es erscheint eine Oberfläche zum Eintragen der Lösungen einer einzelnen Aufgabe.
+	\subsubsection{Aufgabennummer}
+	Dabei geht es um die Aufgabennummer der Einzelaufgabe.
+	\begin{tcolorbox}[example, title=Beispiel: Aufgabennummer]
+		\hspace*{15pt}\texttt{1}\\
+		\hspace*{15pt}\texttt{2a}\\
+		\hspace*{15pt}\texttt{3.2}
+	\end{tcolorbox}
+	\subsubsection{Überschrift}
+	Die Überschrift sollte eine maximal 3-4 Worte lange Kurzbeschreibung der Aufgabe sein. Dies kann beispielsweise ein Texttyp sein, oder eine ausgedachte, inhaltliche Überschrift.
+	\begin{tcolorbox}[example, title=Beispiel: Überschrift]
+		\hspace*{15pt}\texttt{Outline}\\
+		\hspace*{15pt}\texttt{Interpretation}\\
+		\hspace*{15pt}\texttt{Die Industralisierung zusammengefasst.}
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[warning, title=Warnung: Versionsbedingte Fehler]
+		 In der aktuellen Version 1.1 der App geht die Überschrift in der PDF-Abgabe über den Rand hinaus, wenn Sie zu lang ist. Prüfen Sie die PDF-Abgabe und passen Sie die Überschrift ggf. an.
+	\end{tcolorbox}
+	
+	\subsubsection{Beschreibung/Aufgabenlösung}
+	Dabei handelt es sich um den Aufgabeninhalt bzw. die Aufgabenlösung. Schreiben Sie hier also Ihren Text rein, den Sie im Normalfall auf ein Blatt Paper schreiben würden.\\
+	Um Absätze zu markieren, fügen Sie einen doppelten Zeilenumbruch ein, sodass dieser schlussendlich auf dem Papier klar ersichtlich wird. 
+	
+	\paragraph{Text fett markieren:}
+	Um ein oder mehrere Wörter fett zu markieren, fügen Sie jeweils zwei Sterne vor und hinter den zu markierenden Textabschnitt. Beachten Sie dabei, dass Sie, für den Fall, dass Sie doppelte Sterne im Text schreiben wollen, diese mit einem \textbackslash{} markieren müssen.
+	
+	\begin{tcolorbox}[example, title=Beispiel: Text fett markieren]
+		\hspace*{15pt}\texttt{**Wort**}\hspace*{120pt}$\rightarrow$\hspace*{15pt}\textbf{Wort}\\
+		\hspace*{15pt}\texttt{**Dies ist eine Wortgruppe**}\hspace*{15pt}$\rightarrow$\hspace*{15pt}\textbf{Dies ist eine Wortgruppe}\\
+
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[antiexample, title=Gegenbeispiel: Zwei Sterne hintereinander einfügen]
+		Benötigt S zur Darstellung von Fußnoten etc. zwei Sterne hintereinander, können diese wie folgt eingefügt werden:\\\\
+				\hspace*{15pt}\texttt{Text mit \textbackslash** Doppelsternchen}\hspace*{15pt}$\rightarrow$\hspace*{15pt}Text mit ** Doppelsternchen\\
+	\end{tcolorbox}
+	
+	
+	
+		\begin{tcolorbox}[note, title=Hinweis: Versionshinweise]
+		Dieses Feature ist zum aktuellen Zeitpunkt nur geplant (06.03.2025) und wird ab App-Version 1.2 verfügbar sein. In der aktuellen Version 1.1 geschriebene Texte werden beim Abgaben in Version 1.2 ebenfalls entsprechend formatiert.
+	\end{tcolorbox}
+	
+	\newpage
+	\section{Speichern}
+	\subsection{Erste Speicherung}
+	Wählen Sie \texttt{Speichern unter...} um einen Dateipfad zur Zwischenspeicherung auszuwählen. Nutzen Sie dafür wahlweise den Ordner "Dokumente" oder Ähnliches und geben Sie einen Dateinamen ein. Bestätigen Sie den Speicher-Dialog. Eine \texttt{*.exam}-Datei wird im angegebenen Verzeichnis gespeichert. 
+	
+	\begin{tcolorbox}[example, title=Beispiel: Dateinamen]
+		\hspace*{15pt}\texttt{Deutsch 12 - Klausur II - Latsch Lisa Bommel.exam}\\
+		\hspace*{15pt}\texttt{Klausur GK Geschichte 11 - Die Industralisierung - Peter Müller.exam}\\
+		\hspace*{15pt}\texttt{klausur\_mia\_mustermann\_03\_25.exam}
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[antiexample, title=\color{white}{Gegenbeispiel: Schlechte Dateinamen}]
+		Schlechte Dateinamen sind jene, die weder Kontext noch irgendeine andere Zuordnung beinhalten, zum Beispiel \texttt{klausur.exam} oder \texttt{peter.exam}.
+	\end{tcolorbox}
+	
+	\subsection{Weiteres Speichern}
+	Zwischendurch sollte die \texttt{*.exam}-Datei immer wieder gespeichert werden, um Datenverluste zu vermeiden, die etwa bei Stromverlust des Gerätes oder anderen soft- oder hardwareseitigen fehlern auftreten könnten. Dabei reicht jedoch die Funktion \texttt{Speichern}, die die vorherige Datei mit den aktuellen Inhalten überschreibt. \\
+	Diese Datei lässt sich durch \texttt{Öffnen} wiederherstellen, sodass weitergearbeitet werden kann, sollte die App aus irgendeinem Grund beendet worden sein.
+	
+	\subsection{Backups}
+	Von Ihrer Bearbeitung werden unabhängig vom Speichervorgang im Takt von ca. 15 bis 30 Sekunden Backups angefertigt, die im Falle eines schwerwiegenden Fehlers oder Datenverlustes widerhergestellt werden können. Dabei werden maximal 25 Backups angefertigt und anschließend das jeweils älteste Backup mit einem neuen überschrieben. \\\\
+	Sollte eine Widerherstellung der Daten erforderlich sein, so wenden Sie sich bitte an den zuständigen Administrator für die eingerichteten Endgeräte. Dies ist im Normalfall entweder die Person, die Ihnen das Endgerät hat zukommen lassen oder ein ITler.
+	
+	\newpage
+	\section{Abgabe}
+	Die Abgabe der Klausur exportiert die bearbeitete Datei in eine formatierte, druckbare PDF-Datei, die als Abgabe auf einen USB-Stick gezogen und somit von der Lehrkraft eingesammelt wird.
+	\subsection{Abgabevorgang}
+	Nachdem Sie die Bearbeitung fertiggestellt haben, wählen Sie gemeinsam mit der aufsichthabenden Lehrkraft die Schaltfläche \texttt{Abgeben}. Die Lehrkraft sollte nun ihren USB-Stick in das Endgerät stecken. Im Anschluss speichern Sie die PDF-Datei auf dem USB-Stick.
+
+	\begin{tcolorbox}[note, title=Hinweis: Endgültigkeit der Abgabe]
+		Man mag womöglich davon ausgehen, dass der Vorgang die gesamte Arbeit und damit das Programm beendet oder zurücksetzt. Dies ist \textbf{nicht} der Fall, nach dem Speichern der PDF-Datei kann die Klausurbearbeitung weiter fortgesetzt werden.
+	\end{tcolorbox}
+	
+	\subsection{Abgabeattribute}
+	Auf der letzten Seite finden Sie einige Hinweise zum verwendeten PC sowie zur Abgabezeit. Im Folgenden werden einige der nicht selbsterklärenden Eigenschaften erläutert.
+	
+	\begin{tcolorbox}[note, title=Hinweis: Gerätename]
+		Der Gerätename ist der durch den ITler oder Endgerätebeauftragten festgelegte Name des Endgerätes, sodass Sie im Nachhinein nachverfolgen können, auf welchem Gerät das PDF erstellt worden ist. Sprechen Sie im Ernstfall mit dem ITler/Beauftragten, falls der Gerätename vom festgelegten Originalnamen abweicht.
+	\end{tcolorbox}
+
+	\begin{tcolorbox}[note, title=Hinweis: Benutzername]
+		Der Name des PC-Benutzers, durch welchen die PDF-Datei erstellt worden ist. Diesen können Sie im Normalfall sehen, wenn Sie oder der Schüler sich am Rechner anmelden. Weicht dieser vom angemeldeten Konto ab, so könnte ein Täuschungsversuch vorliegen.
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[note, title=Hinweis: Betriebssystem]
+		Wenden Sie sich an Ihren ITler/Endgerätebeauftragen, um das auf dem Endgerät installierte Betriebssystem zu erfragen und mit dem angegebenen Wert zu vergleichen.
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[note, title=Hinweis: IP-Adresse]
+		Die durch den ITler/Endgerätebeauftragten oder den DHCP-Server vergebene Netzwerkadresse des Computers.
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[note, title=Hinweis: Internetverbindung]
+		Das System führt während des PDF-Exportes einen Ping durch und schaut, ob google.com (8.8.8.8) erreichbar ist. Eine Nachverfolgung, ob zwischendurch Internetzugang verfügbar gewesen ist, ist dies jedoch nicht.
+	\end{tcolorbox}
+
+	\newpage
+	\section{Weitere Hinweise}
+	\begin{tcolorbox}[warning, title=Warnung: Abschluss der Klausur]
+		Nach der Klausur und dem PDF-Export (Abgabe) sollten Sie das Endgerät zur mit der Administrierung beauftragten Person zurückbringen, sodass alle Klausurdaten bereinigt werden und Folgeschüler nicht die Möglichkeit haben, auf die durch den Schüler verfassten Inhalte zuzugreifen.
+	\end{tcolorbox}
+	
+	\begin{tcolorbox}[warning, title=Warnung: Datenschutz und Sicherheit]
+		Versuchen Sie nach Möglichkeit, die Abgabe nicht auf dem USB-Stick des Schülers und auf einem freien, nicht durch Sie im Unterricht verwendeten Stick zu speichern.
+	\end{tcolorbox}
+	\vspace*{200pt}
+	
+	\section{Abschluss}
+	Vielen Dank, dass Sie diese Anleitung genutzt haben und sie Ihnen womöglich weiterhelfen könnte. Sollten Ihnen Inhalte fehlen, wenden Sie sich bitte an e.fierke@plg-berlin.de!\\\\
+	Desweiteren bitten wir Sie um Ihr Feedback und freuen uns über Vorschläge zum Einbau neuer oder erweiterter Features oder Behebung von durch Sie gefundene Fehler in der App.
+	
+	
+	\label{LastPage}
 \end{document}
