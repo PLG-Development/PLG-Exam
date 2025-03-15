@@ -294,6 +294,17 @@ namespace PLG_Exam
 
             if (result != null && result.Length > 0)
             {
+                if (!_isSaved)
+                {
+                    var result2 = await MessageBox.Show(this, "Möchten Sie die aktuellen Änderungen speichern?", 
+                                                    "Nicht gespeicherte Änderungen", MessageBoxButton.YesNoCancel);
+                    if (result2 == MessageBoxResult.Cancel) return;
+                    if (result2 == MessageBoxResult.Yes) {
+                        if((await SaveAs()) != true){
+                            return;
+                        }
+                    }
+                }
                 LoadFromFile(result[0]);
             }
         }
@@ -663,8 +674,8 @@ namespace PLG_Exam
 
         private async void ExportToPdf()
         {
-            try
-            {
+            // try
+            // {
 
                 _ = GetCurrentExamDataAsJson();
 
@@ -757,15 +768,21 @@ namespace PLG_Exam
                     informationRect
                 );
 
+                var page = $"Seite {document.PageCount}";
+                endpageGfx.DrawString(page, fontsmall, XBrushes.Gray, new XRect(50, gfx.PageSize.Height - 50 + 15, gfx.PageSize.Width - 50 * 2, 50), XStringFormats.TopRight);
+    
 
+                endpageGfx.Dispose();
+                gfx.Dispose();
+                //AddPageNumbers(document, fontsmall, 35);
                 document.Save(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler beim PDF-Export: {ex.Message}");
-                await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
-            }
+            // }
+            // catch (Exception ex)
+            // {
+            //     Console.WriteLine($"Fehler beim PDF-Export: {ex.Message}");
+            //     await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
+            // }
         }
 
         private bool isInternetAvailable()
@@ -774,7 +791,7 @@ namespace PLG_Exam
             {
                 using (var ping = new Ping())
                 {
-                    var reply = ping.Send("8.8.8.8", 7000); // 3000 ms timeout
+                    var reply = ping.Send("8.8.8.8", 2000); // 3000 ms timeout
                     return reply.Status == IPStatus.Success;
                 }
             }
@@ -801,6 +818,7 @@ namespace PLG_Exam
             PdfPage page = null;
             XGraphics gfx = null;
 
+
             foreach (var line in lines)
             {
                 // Neue Seite erstellen, falls nötig
@@ -811,14 +829,17 @@ namespace PLG_Exam
                     currentHeight = 0;
 
                     // Kopfzeile zeichnen
-                    DrawName(gfx, tab, smallFont, margin, headerHeight);
+                    DrawName(gfx, tab, smallFont, margin, headerHeight, document.PageCount);
                     DrawHeader(gfx, tab, headerFont, margin, headerHeight);
                 }
 
                 // Zeile zeichnen
                 gfx.DrawString(line, font, XBrushes.Black, new XRect(corr_margin, margin + headerHeight*headerline_count + currentHeight, page.Width - margin, lineHeight), XStringFormats.TopLeft);
                 currentHeight += lineHeight;
+                
             }
+            gfx.Dispose();
+
         }
 
         int headerline_count = 0;
@@ -836,16 +857,36 @@ namespace PLG_Exam
 
                 headerline_count++;
             }
+
+            
         }
 
+        private void AddPageNumbers(PdfDocument document, XFont font, double margin)
+        {
+            
+            int totalPages = document.PageCount;
+            for (int i = 1; i < totalPages; i++) // Beginnt ab der zweiten Seite (Index 1)
+            {
+                PdfPage page = document.Pages[i];
+                XGraphics gfx = XGraphics.FromPdfPage(page);
+                string text = $"Seite {i + 1} von {totalPages}";
+                double yPosition = page.Height - margin;
+                gfx.DrawString(text, font, XBrushes.Gray, new XRect(margin, yPosition, page.Width - 2 * margin, 20), XStringFormats.Center);
+                gfx.Dispose();
+                
+            }
+        }
 
-        private void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
+        private void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight, int page_num)
         {
             var headerText = $"{_currentExam.Name}, {_currentExam.Vorname}";
             gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin-15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
     
             var headerText2 = _currentExam.Datum.Value.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("de-DE"));
             gfx.DrawString(headerText2, font, XBrushes.Gray, new XRect(margin, margin-15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopRight);
+            
+            var page = $"Seite {page_num}";
+            gfx.DrawString(page, font, XBrushes.Gray, new XRect(margin, gfx.PageSize.Height - margin + 15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopRight);
     
         }
 
@@ -893,7 +934,10 @@ namespace PLG_Exam
                     {
                         lines.Add(currentLine);
                     }
+
+                    
                 }
+                gfx.Dispose();
             }
 
             return lines;
