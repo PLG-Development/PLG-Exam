@@ -674,8 +674,8 @@ namespace PLG_Exam
 
         private async void ExportToPdf()
         {
-            // try
-            // {
+            try
+            {
 
                 _ = GetCurrentExamDataAsJson();
 
@@ -777,12 +777,12 @@ namespace PLG_Exam
                 //AddPageNumbers(document, fontsmall, 35);
                 document.Save(filePath);
                 await MessageBox.Show(this, "PDF erfolgreich gespeichert!", "Erfolg", MessageBoxButton.Ok);
-            // }
-            // catch (Exception ex)
-            // {
-            //     Console.WriteLine($"Fehler beim PDF-Export: {ex.Message}");
-            //     await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
-            // }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim PDF-Export: {ex.Message}");
+                await MessageBox.Show(this, "Fehler beim PDF-Export.", "Fehler", MessageBoxButton.Ok);
+            }
         }
 
         private bool isInternetAvailable()
