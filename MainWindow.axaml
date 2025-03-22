@@ -18,6 +18,7 @@
                     
                 </StackPanel>
                 <Label x:Name="LblFilename" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Ungespeichert *" />
+                <Button Content="(i)" Click="OnInfoClick" x:Name="BtnInfo" HorizontalAlignment="Right" Margin="0,0,35,0" />
                 <Button Content="Dark Mode" Click="OnDarkModeClick" x:Name="BtnTheme" HorizontalAlignment="Right" Margin="0,0,0,0" />
         </Grid>
         </Border>

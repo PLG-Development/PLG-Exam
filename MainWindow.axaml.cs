@@ -83,6 +83,32 @@ namespace PLG_Exam
             AddNewTab();
         }
 
+        private void OnInfoClick(object? sender, RoutedEventArgs e)
+        {
+            new InfoWindow(CountTotalWords()).Show();
+        }
+
+        public int CountWords(string s)
+        {
+            s = s.Trim();
+            if (s == "")
+                return 0;
+            return s.Split(new char[] { ' ', '.', '?', '!', ',', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        public string CountTotalWords(){
+            _ = GetCurrentExamDataAsJson();
+            string toReturn = "";
+            int totalWords = 0;
+            foreach (var tab in _currentExam.Tabs)
+            {
+                totalWords += CountWords(tab.Inhalt);
+                toReturn += "Aufgabe " + tab.Aufgabennummer + ": " + CountWords(tab.Inhalt) + "\n";
+            }
+            
+            return $"Anzahl Wörter (insg.): {totalWords}\n" + toReturn;
+        }
+
         private async void OnKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
         {
             if (e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Control))
