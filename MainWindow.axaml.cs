@@ -827,6 +827,98 @@ namespace PLG_Exam
             }
         }
 
+        private List<(string Text, XFont Font, XBrush Brush)> ParseFormattedText(string text, XFont regularFont, XFont boldFont, XFont underlineFont)
+        {
+            var result = new List<(string Text, XFont Font, XBrush Brush)>();
+            var currentFont = regularFont;
+            var currentBrush = XBrushes.Black;
+
+            var buffer = new System.Text.StringBuilder();
+            bool isEscaped = false;
+            bool isBold = false;
+            bool isUnderline = false;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+
+                if (isEscaped)
+                {
+                    buffer.Append(c);
+                    isEscaped = false;
+                    continue;
+                }
+
+                if (c == '\\')
+                {
+                    isEscaped = true;
+                    continue;
+                }
+
+                if (c == '*' && i + 1 < text.Length && text[i + 1] == '*')
+                {
+                    if (isBold)
+                    {
+                        result.Add((buffer.ToString(), currentFont, currentBrush));
+                        buffer.Clear();
+                        currentFont = isUnderline ? underlineFont : regularFont;
+                        isBold = false;
+                    }
+                    else
+                    {
+                        result.Add((buffer.ToString(), currentFont, currentBrush));
+                        buffer.Clear();
+                        currentFont = boldFont;
+                        isBold = true;
+                    }
+                    i++; // Skip the second '*'
+                    continue;
+                }
+
+                if (c == '_')
+                {
+                    if (isUnderline)
+                    {
+                        result.Add((buffer.ToString(), currentFont, currentBrush));
+                        buffer.Clear();
+                        currentFont = isBold ? boldFont : regularFont;
+                        isUnderline = false;
+                    }
+                    else
+                    {
+                        result.Add((buffer.ToString(), currentFont, currentBrush));
+                        buffer.Clear();
+                        currentFont = underlineFont;
+                        isUnderline = true;
+                    }
+                    continue;
+                }
+
+                buffer.Append(c);
+            }
+
+            if (buffer.Length > 0)
+            {
+                result.Add((buffer.ToString(), currentFont, currentBrush));
+            }
+
+            return result;
+        }
+
+        private void DrawFormattedText(XGraphics gfx, string text, XFont regularFont, XFont boldFont, XFont underlineFont, XRect rect)
+        {
+            var parsedText = ParseFormattedText(text, regularFont, boldFont, underlineFont);
+            double x = rect.X;
+            double y = rect.Y;
+
+            foreach (var (Text, Font, Brush) in parsedText)
+            {
+                var size = gfx.MeasureString(Text, Font);
+                gfx.DrawString(Text, Font, Brush, new XRect(x, y, rect.Width, rect.Height), XStringFormats.TopLeft);
+                x += size.Width;
+            }
+        }
+
         private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont, XFont smallFont)
         {
             const double margin = 50; // Seitenränder
@@ -836,36 +928,30 @@ namespace PLG_Exam
             const double footerHeight = 20; // Platz für die Fußzeile
             const double usableHeight = 842 - margin * 2 - headerHeight - footerHeight; // Höhe des nutzbaren Bereichs
 
-            // Text aufteilen
             var lines = SplitTextIntoLines(tab.Inhalt, document.Pages[0].Width - margin - corr_margin, font);
 
-            double currentHeight = 0; // Aktuelle Höhe, die der Text benötigt
-
+            double currentHeight = 0;
             PdfPage page = null;
             XGraphics gfx = null;
 
-
             foreach (var line in lines)
             {
-                // Neue Seite erstellen, falls nötig
                 if (page == null || currentHeight + lineHeight > usableHeight)
                 {
                     page = document.AddPage();
                     gfx = XGraphics.FromPdfPage(page);
                     currentHeight = 0;
 
-                    // Kopfzeile zeichnen
                     DrawName(gfx, tab, smallFont, margin, headerHeight, document.PageCount);
                     DrawHeader(gfx, tab, headerFont, margin, headerHeight);
                 }
 
-                // Zeile zeichnen
-                gfx.DrawString(line, font, XBrushes.Black, new XRect(corr_margin, margin + headerHeight*headerline_count + currentHeight, page.Width - margin, lineHeight), XStringFormats.TopLeft);
+                var rect = new XRect(corr_margin, margin + headerHeight * headerline_count + currentHeight, page.Width - margin, lineHeight);
+                DrawFormattedText(gfx, line, font, new XFont(font.Name, font.Size, XFontStyleEx.Bold), new XFont(font.Name, font.Size, XFontStyleEx.Underline), rect);
                 currentHeight += lineHeight;
-                
             }
-            gfx.Dispose();
 
+            gfx?.Dispose();
         }
 
         int headerline_count = 0;
@@ -968,6 +1054,8 @@ namespace PLG_Exam
 
             return lines;
         }
+
+        
 
         private void SetPdfLanguage(PdfSharp.Pdf.PdfDocument document, string language = "de")
         {
