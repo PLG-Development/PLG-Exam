@@ -43,6 +43,10 @@ namespace PLG_Exam
 
             RenewColors();
             this.Closing += MainWindow_Closing;
+
+            if(DatumField.SelectedDate.HasValue == false){
+                DatumField.SelectedDate = DateTime.Now;
+            }
             
         }
 
