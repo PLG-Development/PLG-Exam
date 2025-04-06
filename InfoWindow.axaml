@@ -6,7 +6,10 @@
         x:Class="PLG_Exam.InfoWindow"
         Title="InfoWindow">
         <ScrollViewer>
-          <Label Content="" x:Name="LblInfo" />
-        </ScrollViewer>
-  
+          <StackPanel>
+            <Label Content="" x:Name="LblInfo" />
+            <Label Content="PLG Exam - Version 1.3" />
+            <Label Content="(c) 2025 - PLG Development" />
+          </StackPanel>
+        </ScrollViewer>  
 </Window>
