@@ -175,7 +175,10 @@ namespace PLG_Exam
 
         private async void OnSubmitClick(object sender, RoutedEventArgs e)
         {
-           ExportToPdf();
+            ExportOptions exportOptions = new ExportOptions();
+            exportOptions.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            await exportOptions.ShowDialog(this);
+            
         }
 
 
@@ -720,9 +723,11 @@ namespace PLG_Exam
 
 
 
-        public void ExportToPdf(){
+        public void ExportToPdf(int margin, double lineSpacing, bool hasCorrectionLines, string textPosition){
             _ = GetCurrentExamDataAsJson();
-            PFDExporter.ExportToPdf(_currentExam);
+            PFDExporter exp = new PFDExporter();
+            //exp.ExportToPdf(_currentExam, margin, lineSpacing, hasCorrectionLines, textPosition);
+            exp.ExportAllCombinations(_currentExam);
         }
 
     }

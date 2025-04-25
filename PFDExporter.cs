@@ -11,17 +11,31 @@ using System.Globalization;
 using MigraDoc.DocumentObjectModel;
 using System.Net.NetworkInformation;
 using Avalonia.Styling;
+using System.IO;
 
 namespace PLG_Exam;
 
-public static class PFDExporter
+public class PFDExporter
 {
-    public static Exam exam;
-    public static async void ExportToPdf(Exam examData)
+    public Exam exam;
+    public async void ExportToPdf(Exam examData, int correctionMargin, double lineSpacing, bool hasCorrectionLines, string textPosition, string filePath = null)
     {
         try
         {
             exam = examData;
+            corr_margin = correctionMargin*3;
+            if(corr_margin == 0){
+                corr_margin = 50;
+            }
+            if(lineSpacing == 1.0){
+                lineHeight = 15;
+            } else if(lineSpacing == 1.5){
+                lineHeight = 21;
+            } else if(lineSpacing == 2.0){
+                lineHeight = 27;
+            }
+            this.hasCorrectionLines = hasCorrectionLines;
+            this.textPosition = textPosition;
             //_ = GetCurrentExamDataAsJson();
 
             if(examData.Name.IsValueNullOrEmpty() || examData.Vorname.IsValueNullOrEmpty() || examData.Title.IsValueNullOrEmpty() || examData.Datum == null){
@@ -29,12 +43,15 @@ public static class PFDExporter
                 return;
             }
 
-            var saveDialog = new SaveFileDialog
-            {
-                DefaultExtension = "pdf",
-                Filters = { new FileDialogFilter { Name = "PDF files", Extensions = { "pdf" } } }
-            };
-            var filePath = await saveDialog.ShowAsync(MainWindow._instance);
+            if(filePath==null){
+                var saveDialog = new SaveFileDialog
+                {
+                    DefaultExtension = "pdf",
+                    Filters = { new FileDialogFilter { Name = "PDF files", Extensions = { "pdf" } } }
+                };
+                filePath = await saveDialog.ShowAsync(MainWindow._instance);
+            }
+            
             if (string.IsNullOrEmpty(filePath)) return;
 
             var font = new XFont("Cantarell", 14, XFontStyleEx.Bold);
@@ -130,7 +147,7 @@ public static class PFDExporter
         }
     }
 
-    private static bool isInternetAvailable()
+    private bool isInternetAvailable()
     {
         try
         {
@@ -145,10 +162,10 @@ public static class PFDExporter
             return false;
         }
     }
-    public static bool isEscaped = false;
-    public static bool isBold = false;
-    public static bool isUnderline = false;
-    private static List<(string Text, XFont Font, XBrush Brush)> ParseFormattedText(string text, XFont regularFont, XFont boldFont, XFont underlineFont)
+    public bool isEscaped = false;
+    public bool isBold = false;
+    public bool isUnderline = false;
+    private List<(string Text, XFont Font, XBrush Brush)> ParseFormattedText(string text, XFont regularFont, XFont boldFont, XFont underlineFont)
     {
         var result = new List<(string Text, XFont Font, XBrush Brush)>();
         var currentFont = regularFont;
@@ -232,7 +249,7 @@ public static class PFDExporter
         return result;
     }
 
-    private static void DrawFormattedText(XGraphics gfx, string text, XFont regularFont, XFont boldFont, XFont underlineFont, XRect rect)
+    private void DrawFormattedText(XGraphics gfx, string text, XFont regularFont, XFont boldFont, XFont underlineFont, XRect rect)
     {
         var parsedText = ParseFormattedText(text, regularFont, boldFont, underlineFont);
         double x = rect.X;
@@ -246,11 +263,14 @@ public static class PFDExporter
         }
     }
 
-    private static void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont, XFont smallFont)
+    private double corr_margin = 300; // Seitenrand Korrektur
+    private double lineHeight = 21; // Höhe einer Textzeile
+    private bool hasCorrectionLines = false; // Korrekturrand aktiv
+    private string textPosition = "left"; // Textposition (links, rechts, zentriert)
+
+    private void DrawTaskWithPageBreak(PdfDocument document, ExamTab tab, XFont font, XFont headerFont, XFont smallFont)
     {
         const double margin = 50; // Seitenränder
-        const double corr_margin = 300; // Seitenrand Korrektur
-        const double lineHeight = 21; // Höhe einer Textzeile
         const double headerHeight = 30; // Platz für die Kopfzeile pro Seite
         const double footerHeight = 20; // Platz für die Fußzeile
         const double usableHeight = 842 - margin * 2 - headerHeight - footerHeight; // Höhe des nutzbaren Bereichs
@@ -263,26 +283,58 @@ public static class PFDExporter
 
         foreach (var line in lines)
         {
+            // Wenn eine neue Seite benötigt wird (Seitenumbruch)
             if (page == null || currentHeight + lineHeight > usableHeight)
             {
                 page = document.AddPage();
                 gfx = XGraphics.FromPdfPage(page);
                 currentHeight = 0;
 
+                // Kopfzeile zeichnen
                 DrawName(gfx, tab, smallFont, margin, headerHeight, document.PageCount);
                 DrawHeader(gfx, tab, headerFont, margin, headerHeight);
             }
 
-            var rect = new XRect(corr_margin, margin + headerHeight * headerline_count + currentHeight, page.Width - margin, lineHeight);
+            // Berechnung der Textposition
+            XRect rect;
+            
+
+            // Berechnung der Textposition basierend auf `textPosition`
+            if (textPosition == "right")
+            {
+                rect = new XRect(margin + corr_margin - margin, margin + headerHeight + currentHeight, page.Width - margin - corr_margin, lineHeight);
+                if (hasCorrectionLines && corr_margin > margin)
+                {
+                    // Korrekturlinie wird nur neben dem Text gezeichnet (nur so breit wie der Korrekturrand)
+                    var correctionLineRect = new XRect(margin, margin + headerHeight + currentHeight + 15, corr_margin-margin-10, 1);
+                    gfx.DrawRectangle(XBrushes.LightGray, correctionLineRect);
+                    currentHeight += 1; // Korrekturlinie nimmt Platz ein
+                }
+            }
+            else // links
+            {
+                rect = new XRect(margin, margin + headerHeight + currentHeight, page.Width - (2 * margin) - corr_margin, lineHeight);
+                if (hasCorrectionLines && corr_margin > margin)
+                {
+                    // Korrekturlinie wird nur neben dem Text gezeichnet (nur so breit wie der Korrekturrand)
+                    var correctionLineRect = new XRect(page.Width - corr_margin, margin + headerHeight + currentHeight + 15, corr_margin - margin, 1);
+                    gfx.DrawRectangle(XBrushes.LightGray, correctionLineRect);
+                    currentHeight += 1; // Korrekturlinie nimmt Platz ein
+                }
+            }
+
+            // Text formatieren und zeichnen
             DrawFormattedText(gfx, line, font, new XFont(font.Name, font.Size, XFontStyleEx.Bold), new XFont(font.Name, font.Size, XFontStyleEx.Underline), rect);
-            currentHeight += lineHeight;
+            currentHeight += lineHeight; // Zeilenhöhe für die nächste Zeile erhöhen
         }
 
         gfx?.Dispose();
     }
 
-    private static int headerline_count = 0;
-    private static void DrawHeader(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
+
+
+    private int headerline_count = 0;
+    private void DrawHeader(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight)
     {
         var maxWidth = gfx.PageSize.Width - margin * 2; // verfügbare Breite
         var lines = SplitTextIntoLines($"Aufgabe {tab.Aufgabennummer}: {tab.Überschrift}", maxWidth, font);
@@ -300,7 +352,7 @@ public static class PFDExporter
         
     }
 
-    private static void AddPageNumbers(PdfDocument document, XFont font, double margin)
+    private void AddPageNumbers(PdfDocument document, XFont font, double margin)
     {
         
         int totalPages = document.PageCount;
@@ -316,7 +368,7 @@ public static class PFDExporter
         }
     }
 
-    private static void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight, int page_num)
+    private void DrawName(XGraphics gfx, ExamTab tab, XFont font, double margin, double headerHeight, int page_num)
     {
         var headerText = $"{exam.Name}, {exam.Vorname}";
         gfx.DrawString(headerText, font, XBrushes.Gray, new XRect(margin, margin-15, gfx.PageSize.Width - margin * 2, headerHeight), XStringFormats.TopLeft);
@@ -330,7 +382,7 @@ public static class PFDExporter
     }
 
     // Methode zum Aufteilen des Textes in Zeilen
-    private static List<string> SplitTextIntoLines(string text, double maxWidth, XFont font)
+    private List<string> SplitTextIntoLines(string text, double maxWidth, XFont font)
     {
         var lines = new List<string>();
 
@@ -384,7 +436,7 @@ public static class PFDExporter
 
     
 
-    private static void SetPdfLanguage(PdfSharp.Pdf.PdfDocument document, string language = "de")
+    private void SetPdfLanguage(PdfSharp.Pdf.PdfDocument document, string language = "de")
     {
         var catalog = document.Internals.Catalog;
 
@@ -395,6 +447,43 @@ public static class PFDExporter
         else
         {
             catalog.Elements.Add("/Lang", new PdfSharp.Pdf.PdfString(language));
+        }
+    }
+
+    public void ExportAllCombinations(Exam curr_exam)
+    {
+        exam = curr_exam;
+        // Mögliche Werte für die Variablen
+        var textPositions = new[] { "left", "right" };
+        var hasCorrectionLinesOptions = new[] { true, false };
+        var correctionMargins = new[] { 100.0, 50.0, 0.0 };
+        var lineHeights = new[] { 2.0, 1.5, 1.0 };
+
+        // Ordner für die gespeicherten PDFs
+         string folderPath = "/home/fierke/Schreibtisch";
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath); // Ordner erstellen, falls nicht vorhanden
+        }
+
+        // Generiere alle Kombinationen und exportiere das PDF
+        foreach (var textPosition in textPositions)
+        {
+            foreach (var hasCorrectionLines in hasCorrectionLinesOptions)
+            {
+                foreach (var correctionMargin in correctionMargins)
+                {
+                    foreach (var lineHeight in lineHeights)
+                    {
+                        // Dateiname basierend auf den aktuellen Parametern
+                        string fileName = $"{textPosition}_{hasCorrectionLines}_{correctionMargin}_{lineHeight}.pdf";
+                        string filePath = Path.Combine(folderPath, fileName);
+
+                        // Erstelle das PDF für diese Kombination
+                        ExportToPdf(curr_exam,(int)correctionMargin,lineHeight, hasCorrectionLines,textPosition,filePath);
+                    }
+                }
+            }
         }
     }
 }
