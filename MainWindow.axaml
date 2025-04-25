@@ -17,7 +17,8 @@
                     <Button Content="Abgeben" Click="OnSubmitClick" />
                     
                 </StackPanel>
-                <Label x:Name="LblFilename" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="Ungespeichert *" />
+                <Label x:Name="LblFilename" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-4,0,0" Content="Ungespeichert *" />
+                <Label x:Name="LblClock" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Bottom" Margin="0,0,0,-4" Content="00:00:00" />
                 <Button Content="(i)" Click="OnInfoClick" x:Name="BtnInfo" HorizontalAlignment="Right" Margin="0,0,35,0" />
                 <Button Content="Dark Mode" Click="OnDarkModeClick" x:Name="BtnTheme" HorizontalAlignment="Right" Margin="0,0,0,0" />
         </Grid>
@@ -60,7 +61,7 @@
         <Border x:Name="BrdMid" Margin="0,0,0,0">
             <DockPanel>
                 <Button Content="Weitere Aufgabenlösung hinzufügen" DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="10,10,10,0" Click="OnAddTabClick" />
-                <TabControl Name="TabView" Margin="10">
+                <TabControl Name="TabView" Margin="10,0,10,10">
                     
                 </TabControl>
             </DockPanel>

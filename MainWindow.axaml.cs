@@ -49,6 +49,13 @@ namespace PLG_Exam
             if(DatumField.SelectedDate.HasValue == false){
                 DatumField.SelectedDate = DateTime.Now;
             }
+
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Tick += (_, __) => {
+                LblClock.Content = DateTime.Now.ToString("HH:mm:ss");
+            };
+            timer.Start();
             
         }
 
