@@ -6,7 +6,6 @@
         x:Class="PLG_Exam.MainWindow" WindowState="Maximized"
         Title="PLG Exam">
     <DockPanel Margin="10">
-        <!-- Unterer Teil: Dateiverwaltung -->
         <Border DockPanel.Dock="Top" x:Name="BrdTop" Height="30" Margin="0,0,0,10">
         <Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Center" Spacing="10">
@@ -16,15 +15,22 @@
                     <Button Content="Neu" Click="OnNewClick" />
                     <Button Content="Abgeben" Click="OnSubmitClick" />
                     
-                </StackPanel>
+            </StackPanel>
                 <Label x:Name="LblFilename" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-4,0,0" Content="Ungespeichert *" />
                 <Label x:Name="LblClock" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Bottom" Margin="0,0,0,-4" Content="00:00:00" />
+                <Button Click="OnToggleClick" x:Name="BtnToggle" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,70,0">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="24" Height="24">
+                            <Path Data="M7,20 L12,15 L17,20" Stroke="Black" StrokeThickness="2" StrokeLineCap="Round"/>
+                            <Path Data="M7,4 L12,9 L17,4" Stroke="Black" StrokeThickness="2"  StrokeLineCap="Round"/>
+                        </Canvas>
+                    </Viewbox>
+                </Button>
                 <Button Content="(i)" Click="OnInfoClick" x:Name="BtnInfo" HorizontalAlignment="Right" Margin="0,0,35,0" />
                 <Button Content="Dark Mode" Click="OnDarkModeClick" x:Name="BtnTheme" HorizontalAlignment="Right" Margin="0,0,0,0" />
         </Grid>
         </Border>
 
-        <!-- Überoberer Teil: Title -->
         <Border DockPanel.Dock="Top" x:Name="BrdTitle"  Height="82" Margin="0,0,0,10">
             <Grid Margin="10">
                 <StackPanel Grid.Column="0" Margin="5" Spacing="5">
@@ -34,7 +40,6 @@
             </Grid>
         </Border>
 
-        <!-- Oberer Teil: Name, Vorname, Datum -->
         <Border DockPanel.Dock="Top" x:Name="BrdName" Height="82" Margin="0,0,0,10">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
@@ -57,7 +62,7 @@
             </Grid>
         </Border>
 
-        <!-- Mittlerer Teil: Tabansicht -->
+
         <Border x:Name="BrdMid" Margin="0,0,0,0">
             <DockPanel>
                 <Button Content="Weitere Aufgabenlösung hinzufügen" DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="10,10,10,0" Click="OnAddTabClick" />

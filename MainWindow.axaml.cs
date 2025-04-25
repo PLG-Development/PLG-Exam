@@ -96,6 +96,15 @@ namespace PLG_Exam
             AddNewTab();
         }
 
+        private bool isFormVisible = true;
+        private void OnToggleClick(object? sender, RoutedEventArgs e)
+        {
+            isFormVisible = !isFormVisible;
+
+            BrdTitle.IsVisible = isFormVisible;
+            BrdName.IsVisible = isFormVisible;
+        }
+
         private void OnInfoClick(object? sender, RoutedEventArgs e)
         {
             new InfoWindow(CountTotalWords()).Show();
