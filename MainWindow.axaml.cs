@@ -726,8 +726,8 @@ namespace PLG_Exam
         public void ExportToPdf(int margin, double lineSpacing, bool hasCorrectionLines, string textPosition){
             _ = GetCurrentExamDataAsJson();
             PFDExporter exp = new PFDExporter();
-            //exp.ExportToPdf(_currentExam, margin, lineSpacing, hasCorrectionLines, textPosition);
-            exp.ExportAllCombinations(_currentExam);
+            exp.ExportToPdf(_currentExam, margin, lineSpacing, hasCorrectionLines, textPosition);
+            //exp.ExportAllCombinations(_currentExam);
         }
 
     }
